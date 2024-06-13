@@ -1,0 +1,140 @@
+---
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+# Introduction
+
+Title: Progress Report
+
+Email ID: nagadadinni.sanjeev\@stud.hs-fresenius.de
+
+Mandate reference: 400391884
+
+Author: Sanjeev Nagadadinni
+
+Format: revealjs
+
+# About Dataset
+
+1.  **Introduction to Dataset:** The dataset I am working with is
+    extracted from the EconDataMAG database. It contains detailed
+    information on academic publications and citations for various
+    authors in the field of economics
+
+2.  **Contents of the Dataset:** The dataset includes information such
+    as author IDs, paper IDs, publication years, citation counts, number
+    of authors per paper, and more.
+
+3.  **Key Variables and Their Descriptions:** authorid : A unique
+    identifier for each author. paperid : A unique identifier for each
+    paper. year : The year of publication. citationcount : The number of
+    citations a paper has received. author_cnt : The number of authors
+    for each paper. solo : A binary variable indicating if the paper is
+    solo-authored.
+
+4.  **Structure:** The dataset contains X rows and Y columns, where each
+    row represents a unique author-paper combination.
+
+5.  **Data Preparation and Cleaning:** We filtered the dataset to remove
+    duplicate author-paper combinations, calculated career metrics for
+    each author, and identified solo-authored papers.
+
+6.  **Visualizations:** I will be creating several plots to visualize
+    and replicate the plot graph.
+
+# What is R?
+
+Generally speaking, the main uses for the publicly available programming
+language R are statistical computing and graphing. The University of
+Auckland in New Zealand's Ross Ihaka and Robert Gentleman were among the
+first to design the programming language known as R in the early 1990s.
+Since then, R has grown into a feature-rich platform that integrates a
+large number of packages and libraries. One distribution that is based
+on R is the RStudio (n.d.) distribution. The goal of the language's
+creators is to create a powerful and user-friendly grammar, especially
+for tasks involving data processing and statistical computations.
+Furthermore, this architecture makes.
+
+# What is R Markdown?
+
+A simple markup language called R Markdown was created with content
+organisation in mind. It accomplishes this by fusing Markdown's
+simplicity with R's strength.Customers may easily combine code, data
+outputs, and narrative prose into a single document by using R Markdown.
+This versatile method for producing reports may produce a large range of
+output formats, such as Word, PDF, and HTML pages.
+
+# Working Directory and Data location:
+
+setwd("/Volumes/sanjeev/2_Sem/untitled folder/DS/133141-V1 2")
+
+econ_data \<- read_dta("/Volumes/sanjeev/2_Sem/untitled
+folder/DS/133141-V1 2/EconDataMAG.dta")
+
+# Compressing My .dta file:
+
+```{r}
+library(haven)
+
+# Load the data from the .dta file
+econ_data <- read_dta("/Volumes/sanjeev/2_Sem/untitled folder/DS/133141-V1 2/EconDataMAG.dta")
+
+# Save the data as a compressed .RDS file
+saveRDS(econ_data, "EconDataMAG_compressed.rds", compress = TRUE)
+```
+
+# Figure 3 Replication:
+
+***Generality Across Economic Subfields,***
+
+```{r}
+
+library(dplyr)
+library(ggplot2)
+library(haven)
+
+# Load the data
+# Assuming the data is saved as "EconDataMAG.dta"
+econ_data <- read_dta("/Volumes/sanjeev/2_Sem/untitled folder/DS/133141-V1 2/EconDataMAG.dta")
+
+# Filter data for relevant years (1950s and 2018)
+econ_data_filtered <- econ_data %>%
+  filter((year >= 1950 & year < 1960) | year == 2018)
+
+# Calculate the share of team-authored papers for each subfield and year
+team_authored <- econ_data_filtered %>%
+  group_by(year, fieldname) %>%
+  summarise(
+    team_papers = sum(author_cnt > 1),
+    total_papers = n()
+  ) %>%
+  mutate(share_team_authored = team_papers / total_papers)
+
+# Split data into 1950s and 2018
+team_authored_1950s <- team_authored %>% filter(year < 1960)
+team_authored_2018 <- team_authored %>% filter(year == 2018)
+
+# Merge data to have both 1950s and 2018 shares in one dataframe
+summary_data <- merge(team_authored_1950s, team_authored_2018, by = "fieldname", suffixes = c("_1950s", "_2018"))
+
+# Filter to include only specific economic subfields
+# Example: Filter for subfields with a significant number of papers in both periods
+top_fields <- summary_data %>%
+  filter(total_papers_1950s > 10 & total_papers_2018 > 10)
+
+# Plot the data
+ggplot(top_fields, aes(x = share_team_authored_1950s, y = share_team_authored_2018)) +
+  geom_point() +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+  labs(
+    title = "Generality across Economic Subfields",
+    x = "Share team-authored, 1950s",
+    y = "Share team-authored, 2018"
+  ) +
+  theme_minimal() +
+  geom_text(aes(label = fieldname), hjust = 1, vjust = 1, size = 3)
+
+
+```
