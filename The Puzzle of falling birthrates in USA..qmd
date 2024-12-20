@@ -1,0 +1,59 @@
+---
+title: "The Puzzle of Falling Birthrates in USA"
+author: "Venkatesh Kannan"
+format: html
+editor: visual
+---
+
+# 1 Abstract
+
+The purpose of this project is to replicate and analyse the trends in the birth rates of the United States as represented in a recent report about demographic and societal shifts in fertility patterns. The objective will be to recreate the figures and analyses showing the decline in U.S. birth rates from 2001 to 2019 by age group, demographic characteristics, educational attainment, marital status, birth order, and state-level variations. Using R and high-level data visualization, we move closer to the exact replica of the report's visualizations and findings.
+
+# 2 Objective of the Paper
+
+The key focus of this paper is to analyse and reproduce important findings from a report on the falling birth rates in the U.S. using open datasets and statistical tools. This research aims to do the following: - Analyse the trends in birth rates among demographic groups, by educational attainment, marital status, and state. -Explore the potential social, economic, and cultural drivers behind the observed patterns. -Examine how declining birth rates would have an impact on population dynamics, policy, and economic stability. -Create high-quality visualizations and narratives using RStudio, R Markdown, and Quarto to effectively communicate findings.
+
+# 3 Data Retrieval and Reading
+
+The data for this study was extracted from the publicly available datasets made available by the article "The Puzzle of Falling U.S. Birth Rates Since the Great Recession" \* by Kearney et al., published in the Journal of Economic Perspectives, and accessible at <https://www.aeaweb.org/articles?id=10.1257/jep.36.1.151>. These include the US birth rates disaggregated by age groups, demographic characteristics, education levels, marital statuses, and birth orders, along with state variations.
+
+The analysis was done in RStudio, where the processing were done using tools from the packages `dplyr` and `tidyr`. Key trends and patterns were visualized using the `ggplot2` package; in many cases, datasets had to be reshaped into long formats to be able to plot them effectively. Also, customizations to legends and visual aesthetics have been done to adapt the plots to the original report format. Library usmap provided an easy way to map state-to-state variation in birth rates, while R Markdown was used for integrating all visualizations and results into a reproducible report format.
+
+# 4 Graphical Representation
+
+## 4.1 Figure 1: Trend in US Birth Rates (2001-2019)
+
+```{}
+library(ggplot2)
+library(dplyr)
+library(sf)          # For spatial data
+library(tidyr)       # For data manipulation (pivot_wider)
+library(haven)       # For .dta files
+setwd("C:/Users/Venka/Desktop/Uni subjects/data science for business/New folder/data")
+#FIGURE 1
+# Load the dataset
+birth_data <- read.csv("numbirths_2001_2019.csv")
+#data manipulation
+birth_trend <- birth_data %>%
+  group_by(year) %>%
+  summarise(total_births = sum(numbirth1544))%>%
+  mutate(birth_rate = total_births / 1000)  # Assuming birth rate per 1,000 women
+
+
+# Plot the trend in US birth rates
+ggplot(birth_trend, aes(x = year, y = total_births)) +
+  geom_line(color = "blue", size = 1) +
+  geom_vline(xintercept = 2007, linetype = "dashed", color = "grey") + 
+  scale_x_continuous(breaks = seq(1980, 2020, 5)) +
+  scale_y_continuous(breaks = seq(55, 80, 5)) +
+  labs(title = "Fig:1 Trend in US Birth Rates (2001-2019)",
+       x = "Year",
+       y = "Total Births (Ages 15-44)") +
+  theme_minimal()
+```
+
+## 4.2 Figure 2a: Birth Rates by Age Group Over Time
+```{r}
+
+```
+
